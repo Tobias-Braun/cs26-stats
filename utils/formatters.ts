@@ -27,3 +27,9 @@ export function fmtTime(date: Date): string {
 export function fmtUTC(date: Date): string {
   return `${String(date.getUTCHours()).padStart(2, '0')}:${String(date.getUTCMinutes()).padStart(2, '0')}`
 }
+
+export function fmtCEST(date: Date): string {
+  // CEST is UTC+2 during summer time
+  const cestDate = new Date(date.getTime() + 2 * 60 * 60 * 1000)
+  return `${String(cestDate.getUTCHours()).padStart(2, '0')}:${String(cestDate.getUTCMinutes()).padStart(2, '0')}`
+}

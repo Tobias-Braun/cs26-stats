@@ -120,12 +120,12 @@ const tooltipY = computed(() => Math.max(hereY.value - 50, PAD_T + 10))
     <div class="chart-head">
       <div>
         <div class="chart-title">
-          Course Elevation
+          Strecken-Höhenprofil
           <small>{{ TOTAL_KM }} KM</small>
         </div>
       </div>
       <div class="chart-legend">
-        <span>SLOPE</span>
+        <span>STEIGUNG</span>
         <div style="display: flex; flex-direction: column; gap: 3px">
           <span class="grad-key" />
           <div class="grad-key-tics">
@@ -251,12 +251,12 @@ const tooltipY = computed(() => Math.max(hereY.value - 50, PAD_T + 10))
         </text>
         <text x="10" y="27" font-family="JetBrains Mono, monospace" font-size="11" letter-spacing="0.06em"
               fill="white" font-weight="600">
-          {{ Math.round(herePoint.elevationM) }} m elevation
+          {{ Math.round(herePoint.elevationM) }} m höhe
         </text>
         <text x="10" y="40" font-family="JetBrains Mono, monospace" font-size="10.5" letter-spacing="0.08em"
               :fill="hereSegment?.color ?? 'white'" font-weight="600">
           {{ hereSegment && hereSegment.slopePct >= 0 ? '↗' : '↘' }}
-          {{ hereSegment ? Math.abs(hereSegment.slopePct).toFixed(1) : '0.0' }}% slope
+          {{ hereSegment ? Math.abs(hereSegment.slopePct).toFixed(1) : '0.0' }}% steigung
         </text>
       </g>
     </svg>

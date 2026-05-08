@@ -111,10 +111,10 @@ export function useEventStats() {
 
   const hrZone = computed(() => {
     const hr = heartRate.value
-    if (hr < 115) return { num: 1, name: 'RECOVERY' }
-    if (hr < 130) return { num: 2, name: 'AEROBIC' }
+    if (hr < 115) return { num: 1, name: 'ERHOLUNG' }
+    if (hr < 130) return { num: 2, name: 'AEROB' }
     if (hr < 145) return { num: 3, name: 'TEMPO' }
-    if (hr < 160) return { num: 4, name: 'THRESHOLD' }
+    if (hr < 160) return { num: 4, name: 'SCHWELLE' }
     return { num: 5, name: 'MAX' }
   })
 
@@ -177,9 +177,14 @@ export function useEventStats() {
       .select('elapsed_seconds, distance_km, heart_rate, current_speed, recorded_at')
       .order('recorded_at', { ascending: false })
       .limit(2)
-      .then(({ data }) => {
+      .then(({ data, error }) => {
+        if (error) {
+          console.error('[stats] initial fetch failed:', error.message)
+          return
+        }
         if (data && data.length > 0) {
           readings.value = (data as AthleteStatsRow[]).reverse().map(rowToReading)
+          console.log(`[stats] loaded ${data.length} initial readings`)
         }
       })
 
@@ -191,7 +196,11 @@ export function useEventStats() {
         { event: 'INSERT', schema: 'public', table: 'athlete_stats' },
         payload => pushReading(payload.new as AthleteStatsRow),
       )
-      .subscribe()
+      .subscribe((status) => {
+        if (status === 'SUBSCRIBED') {
+          console.log('[stats] realtime subscribed')
+        }
+      })
   })
 
   return {

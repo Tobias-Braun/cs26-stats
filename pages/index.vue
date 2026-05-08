@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { fmtHMS, fmtPace, fmtUTC } from '~/utils/formatters'
-import { TOTAL_KM, CUTOFF_SECONDS, ATHLETE_NAME } from '~/utils/constants'
-
+import { fmtHMS, fmtPace, fmtCEST } from "~/utils/formatters";
+import { TOTAL_KM, CUTOFF_SECONDS, ATHLETE_NAME } from "~/utils/constants";
 
 const {
   elapsedSeconds,
@@ -20,20 +19,20 @@ const {
   eta,
   pacePct,
   supabaseEnabled,
-} = useEventStats()
+} = useEventStats();
 
-const { points: elevationPoints, pending: elevPending } = useElevationData()
+const { points: elevationPoints, pending: elevPending } = useElevationData();
 
-// UTC clock in the topbar — updates every minute
-const utcTime = ref('')
+// CEST clock in the topbar — updates every minute
+const utcTime = ref("");
 function updateUtcTime() {
-  utcTime.value = fmtUTC(new Date())
+  utcTime.value = fmtCEST(new Date());
 }
 onMounted(() => {
-  updateUtcTime()
-  const id = setInterval(updateUtcTime, 60_000)
-  onUnmounted(() => clearInterval(id))
-})
+  updateUtcTime();
+  const id = setInterval(updateUtcTime, 60_000);
+  onUnmounted(() => clearInterval(id));
+});
 </script>
 
 <template>
@@ -43,17 +42,21 @@ onMounted(() => {
       <div class="brand">
         <div class="brand-mark" />
         <div>
-          <div class="brand-name">CS26 · LIVE TELEMETRY</div>
+          <div class="brand-name">CS26 · LIVE TELEMETRIEDATEN</div>
           <div class="brand-sub">
-            athlete · {{ ATHLETE_NAME.toLowerCase() }}
-            <span v-if="!supabaseEnabled" style="color: var(--warn); margin-left: 8px">[demo mode]</span>
+            athlet · {{ ATHLETE_NAME.toLowerCase() }}
+            <span
+              v-if="!supabaseEnabled"
+              style="color: var(--warn); margin-left: 8px"
+              >[demo-modus]</span
+            >
           </div>
         </div>
       </div>
       <div class="top-meta">
         <div class="pill"><span class="dot" /> live</div>
-        <div class="pill">utc {{ utcTime }}</div>
-        <div class="pill">gps lock</div>
+        <div class="pill">cest {{ utcTime }}</div>
+        <div class="pill">gps-lock</div>
       </div>
     </div>
 
@@ -64,15 +67,17 @@ onMounted(() => {
         <span class="accent"> 96h</span>
       </h1>
       <div class="run-meta">
-        <div>start <b>06 may 2026 · 06:00:00 utc</b></div>
-        <div>cutoff <b>10 may 2026 · 06:00:00 utc</b></div>
-        <div>athlete <b>{{ ATHLETE_NAME }}</b></div>
+        <div>start <b>06. mai 2026 · 08:00:00 cest</b></div>
+        <div>zielzeit <b>10. mai 2026 · 08:00:00 cest</b></div>
+        <div>
+          athlet <b>{{ ATHLETE_NAME }}</b>
+        </div>
       </div>
     </div>
 
     <!-- ── Course progress bar ── -->
     <div class="progress-row">
-      <div class="prog-label">course progress</div>
+      <div class="prog-label">streckenfortschritt</div>
       <div class="prog-bar">
         <div class="prog-fill" :style="{ width: `${progressPct}%` }" />
         <div class="prog-tics" />
@@ -84,21 +89,20 @@ onMounted(() => {
 
     <!-- ── KPI grid ── -->
     <div class="kpi-grid">
-
       <!-- 01 Elapsed time -->
-      <KpiPanel class="col-7" idx="01" label="elapsed time" :hot="true">
+      <KpiPanel class="col-7" idx="01" label="verstrichene zeit" :hot="true">
         <div class="k-value">
           <span class="num mega mono">{{ fmtHMS(elapsedSeconds) }}</span>
         </div>
         <div class="k-sub">
-          <span>96:00:00 cutoff</span>
+          <span>96:00:00 zielzeit</span>
           <span>·</span>
-          <span>{{ fmtHMS(cutoffRemainingSeconds) }} remaining on clock</span>
+          <span>{{ fmtHMS(cutoffRemainingSeconds) }} verbleibend</span>
         </div>
       </KpiPanel>
 
       <!-- 02 Heart rate -->
-      <KpiPanel class="col-5" idx="02" label="heart rate">
+      <KpiPanel class="col-5" idx="02" label="herzfrequenz">
         <div class="k-value">
           <span class="num mono">{{ heartRate }}</span>
           <span class="unit">bpm</span>
@@ -109,7 +113,7 @@ onMounted(() => {
       </KpiPanel>
 
       <!-- 03 Current pace -->
-      <KpiPanel class="col-3" idx="03" label="pace · current">
+      <KpiPanel class="col-3" idx="03" label="tempo · aktuell">
         <div class="k-value">
           <span class="num mono">{{ fmtPace(currentPaceSec) }}</span>
           <span class="unit">min/km</span>
@@ -121,7 +125,7 @@ onMounted(() => {
       </KpiPanel>
 
       <!-- 04 Average pace -->
-      <KpiPanel class="col-3" idx="04" label="pace · average">
+      <KpiPanel class="col-3" idx="04" label="tempo · durchschnitt">
         <div class="k-value">
           <span class="num mono">{{ fmtPace(avgPaceSec) }}</span>
           <span class="unit">min/km</span>
@@ -131,24 +135,27 @@ onMounted(() => {
           :ref-pct="pacePct(requiredPaceSec)"
         />
         <div class="k-sub">
-          <span>over {{ distanceDone.toFixed(1) }} km</span>
+          <span>über {{ distanceDone.toFixed(1) }} km</span>
         </div>
       </KpiPanel>
 
       <!-- 05 Distance completed -->
-      <KpiPanel class="col-3" idx="05" label="distance · completed">
+      <KpiPanel class="col-3" idx="05" label="distanz · zurückgelegt">
         <div class="k-value">
           <span class="num mono">{{ distanceDone.toFixed(1) }}</span>
           <span class="unit">km</span>
         </div>
         <PaceBar :fill-pct="(distanceDone / TOTAL_KM) * 100" />
         <div class="k-sub">
-          <span>{{ ((distanceDone / TOTAL_KM) * 100).toFixed(1) }} % of {{ TOTAL_KM }} km</span>
+          <span
+            >{{ ((distanceDone / TOTAL_KM) * 100).toFixed(1) }} % von
+            {{ TOTAL_KM }} km</span
+          >
         </div>
       </KpiPanel>
 
       <!-- 06 Distance remaining -->
-      <KpiPanel class="col-3" idx="06" label="distance · remaining">
+      <KpiPanel class="col-3" idx="06" label="distanz · verbleibend">
         <div class="k-value">
           <span class="num mono">{{ distanceRemaining.toFixed(1) }}</span>
           <span class="unit">km</span>
@@ -159,7 +166,10 @@ onMounted(() => {
           :dim-fill="true"
         />
         <div class="k-sub">
-          <span>{{ ((distanceRemaining / TOTAL_KM) * 100).toFixed(1) }} % remaining</span>
+          <span
+            >{{ ((distanceRemaining / TOTAL_KM) * 100).toFixed(1) }} %
+            verbleibend</span
+          >
         </div>
       </KpiPanel>
 
@@ -180,8 +190,18 @@ onMounted(() => {
 
       <!-- Elevation chart + disclaimer -->
       <div class="col-12">
-        <div v-if="elevPending" style="padding: 40px; text-align: center; color: var(--ink-dim); font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 0.12em">
-          LOADING ELEVATION PROFILE…
+        <div
+          v-if="elevPending"
+          style="
+            padding: 40px;
+            text-align: center;
+            color: var(--ink-dim);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            letter-spacing: 0.12em;
+          "
+        >
+          HÖHENPROFIL WIRD GELADEN…
         </div>
         <ElevationChart
           v-else-if="elevationPoints"
@@ -193,14 +213,12 @@ onMounted(() => {
         <div class="footer-note">
           <div class="icon">!</div>
           <div>
-            <b style="color: var(--ink)">ELEVATION PROFILE · DISCLAIMER.</b>
-            the route was traced manually and is not consistently accurate over 600 km —
-            this profile is intended for rough orientation only. deviations in position
-            and elevation are possible. not for navigation or official records.
+            <b style="color: var(--ink)">HÖHENPROFIL · HINWEIS.</b>
+            die strecke wurde manuell erfasst und ist über 600 km nicht konsistent genau — dieses profil dient nur der groben orientierung.
+            abweichungen in position und höhe sind vorhanden.
           </div>
         </div>
       </div>
-
     </div>
   </div>
 </template>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { fmtHM, fmtPace, fmtTime } from '~/utils/formatters'
+import { fmtHM, fmtPace, fmtCEST } from '~/utils/formatters'
 
 const props = defineProps<{
   projectedRemainingSeconds: number
@@ -13,9 +13,9 @@ const props = defineProps<{
   eta: Date
 }>()
 
-const etaStr = computed(() => fmtTime(props.eta))
+const etaStr = computed(() => fmtCEST(props.eta))
 const etaDate = computed(() =>
-  props.eta.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }).toLowerCase(),
+  props.eta.toLocaleDateString('de-DE', { day: '2-digit', month: 'short' }).toLowerCase(),
 )
 const overCutoffBy = computed(() =>
   props.projectedRemainingSeconds + props.elapsedSeconds - props.cutoffSeconds,
@@ -29,21 +29,21 @@ const requiredFasterThanAvg  = computed(() => props.requiredPaceSec < props.avgP
     <!-- Projected finish time at current avg pace -->
     <div class="proj">
       <div class="stripe" />
-      <div class="proj-tag">⏱ finish forecast</div>
+      <div class="proj-tag">⏱ zielprognose</div>
       <div class="proj-name">
-        Projected finish <span>· at current avg pace</span>
+        Projiziertes Ziel <span>· bei aktuellem Durchschnittstempo</span>
       </div>
       <div class="proj-val mono">
         {{ fmtHM(projectedRemainingSeconds) }}<span class="unit">hh:mm</span>
       </div>
       <div class="proj-foot">
-        eta · <b>{{ etaDate }} · {{ etaStr }}</b>
+        ankunft · <b>{{ etaDate }} · {{ etaStr }}</b>
         &nbsp;·&nbsp;
         <span v-if="isOnTrack" style="color: var(--good)">
-          finishes inside cutoff · margin {{ fmtHM(cutoffMarginSeconds) }}
+          finisht vor zielzeit · puffer {{ fmtHM(cutoffMarginSeconds) }}
         </span>
         <span v-else style="color: var(--hot)">
-          over cutoff by {{ fmtHM(overCutoffBy) }}
+          über zielzeit um {{ fmtHM(overCutoffBy) }}
         </span>
       </div>
     </div>
@@ -51,22 +51,22 @@ const requiredFasterThanAvg  = computed(() => props.requiredPaceSec < props.avgP
     <!-- Minimum pace needed to beat the cutoff -->
     <div class="proj">
       <div class="stripe" />
-      <div class="proj-tag">⚡ cutoff pace</div>
+      <div class="proj-tag">⚡ erforderliches tempo</div>
       <div class="proj-name">
-        Minimum pace needed <span>· to finish within 96 h</span>
+        Minimales Tempo erforderlich <span>· um innerhalb von 96 h zu finishen</span>
       </div>
       <div class="proj-val mono">
         {{ fmtPace(requiredPaceSec) }}<span class="unit">min/km</span>
       </div>
       <div class="proj-foot">
         <span v-if="requiredFasterThanCurr" style="color: var(--hot)">
-          ▲ must run {{ fmtPace(currentPaceSec - requiredPaceSec) }} faster than current
+          ▲ muss {{ fmtPace(currentPaceSec - requiredPaceSec) }} schneller laufen als aktuell
         </span>
         <span v-else style="color: var(--good)">
-          ▼ buffer of {{ fmtPace(requiredPaceSec - currentPaceSec) }} below current pace
+          ▼ puffer von {{ fmtPace(requiredPaceSec - currentPaceSec) }} unter aktuellem tempo
         </span>
         &nbsp;·&nbsp;
-        vs avg <b>{{ requiredFasterThanAvg ? '▲' : '▼' }} {{ fmtPace(Math.abs(requiredPaceSec - avgPaceSec)) }}</b>
+        vs ø <b>{{ requiredFasterThanAvg ? '▲' : '▼' }} {{ fmtPace(Math.abs(requiredPaceSec - avgPaceSec)) }}</b>
       </div>
     </div>
   </div>
