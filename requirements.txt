@@ -1,0 +1,6 @@
+opencv-python
+pytesseract
+yt-dlp
+numpy
+supabase
+python-dotenv
