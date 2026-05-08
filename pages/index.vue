@@ -67,8 +67,8 @@ onMounted(() => {
         <span class="accent"> 96h</span>
       </h1>
       <div class="run-meta">
-        <div>start <b>06. mai 2026 · 08:00:00 cest</b></div>
-        <div>zielzeit <b>10. mai 2026 · 08:00:00 cest</b></div>
+        <div>start <b>06. mai 2026 · 20:00:00 cest</b></div>
+        <div>zielzeit <b>10. mai 2026 · 20:00:00 cest</b></div>
         <div>
           athlet <b>{{ ATHLETE_NAME }}</b>
         </div>
@@ -214,7 +214,8 @@ onMounted(() => {
           <div class="icon">!</div>
           <div>
             <b style="color: var(--ink)">HÖHENPROFIL · HINWEIS.</b>
-            die strecke wurde manuell erfasst und ist über 600 km nicht konsistent genau — dieses profil dient nur der groben orientierung.
+            die strecke wurde manuell erfasst und ist über 600 km nicht
+            konsistent genau — dieses profil dient nur der groben orientierung.
             abweichungen in position und höhe sind vorhanden.
           </div>
         </div>
